@@ -27,3 +27,8 @@ func Read() (Config, error) {
 	}
 	return cfg, nil
 }
+
+func (cfg *Config) SetUser(username string) error {
+	cfg.CurrentUserName = username
+	return write(*cfg)
+}
