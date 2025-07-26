@@ -42,3 +42,15 @@ func getConfigFilePath() (string, error) {
 	}
 	return filepath.Join(homeDir, configFileName), nil
 }
+
+func write(cfg Config) error {
+	configPath, err := getConfigFilePath()
+	if err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(configPath, data, 0644)
+}
