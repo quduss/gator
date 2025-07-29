@@ -16,6 +16,10 @@ type command struct {
 	args []string
 }
 
+type commands struct {
+	handlers map[string]func(*state, command) error
+}
+
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.args) == 0 {
 		return fmt.Errorf("usage: gator login <username>")
@@ -26,6 +30,7 @@ func handlerLogin(s *state, cmd command) error {
 		return fmt.Errorf("couldn't set current user: %w", err)
 	}
 	fmt.Printf("User has been set to: %s\n", username)
+	return nil
 }
 
 func main() {
