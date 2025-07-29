@@ -20,6 +20,14 @@ type commands struct {
 	handlers map[string]func(*state, command) error
 }
 
+func (c *commands) run(s *state, cmd command) error {
+	handler, exists := c.handlers[cmd.name]
+	if !exists {
+		return fmt.Errorf("unknown command: %s", cmd.name)
+	}
+	return handler(s, cmd)
+}
+
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.args) == 0 {
 		return fmt.Errorf("usage: gator login <username>")
