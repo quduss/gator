@@ -11,6 +11,23 @@ type state struct {
 	cfg *config.Config
 }
 
+type command struct {
+	name string
+	args []string
+}
+
+func handlerLogin(s *state, cmd command) error {
+	if len(cmd.args) == 0 {
+		return fmt.Errorf("usage: gator login <username>")
+	}
+	username := cmd.args[0]
+	err := s.cfg.SetUser(username)
+	if err != nil {
+		return fmt.Errorf("couldn't set current user: %w", err)
+	}
+	fmt.Printf("User has been set to: %s\n", username)
+}
+
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
