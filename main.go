@@ -28,6 +28,10 @@ func (c *commands) run(s *state, cmd command) error {
 	return handler(s, cmd)
 }
 
+func (c *commands) register(name string, f func(*state, command) error) {
+	c.handlers[name] = f
+}
+
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.args) == 0 {
 		return fmt.Errorf("usage: gator login <username>")
