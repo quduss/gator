@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"os"
 
 	"gator/internal/config"
 )
@@ -48,17 +48,33 @@ func handlerLogin(s *state, cmd command) error {
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		log.Fatalf("Error reading config: %v", err)
+		fmt.Printf("Error reading config: %v\n", err)
+		os.Exit(1)
 	}
-	err = cfg.SetUser("qudus")
+	programState := &state{
+		cfg: &cfg,
+	}
+	cmds := &commands{
+		handlers: make(map[string]func(*state, command) error),
+	}
+	cmds.register("login", handlerLogin)
+	args := os.Args
+	if len(args) < 2 {
+		fmt.Println("Error: not enough arguments provided")
+		os.Exit(1)
+	}
+	cmdName := args[1]
+	cmdArgs := []string{}
+	if len(args) > 2 {
+		cmdArgs = args[2:]
+	}
+	cmd := command{
+		name: cmdName,
+		args: cmdArgs,
+	}
+	err = cmds.run(programState, cmd)
 	if err != nil {
-		log.Fatalf("Error setting user: %v", err)
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
 	}
-	cfg, err = config.Read()
-	if err != nil {
-		log.Fatalf("Error reading config after update: %v", err)
-	}
-	fmt.Printf("Config contents:\n")
-	fmt.Printf("Database URL: %s\n", cfg.DbURL)
-	fmt.Printf("Current User: %s\n", cfg.CurrentUserName)
 }
