@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"gator/internal/config"
+	"github.com/quduss/gator/internal/config"
 )
 
 type state struct {
