@@ -5,10 +5,12 @@ import (
 	"os"
 
 	"github.com/quduss/gator/internal/config"
+	"github.com/quduss/gator/internal/database"
 )
 
 type state struct {
 	cfg *config.Config
+	db  *database.Queries
 }
 
 type command struct {
