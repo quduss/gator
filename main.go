@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/quduss/gator/internal/config"
 	"github.com/quduss/gator/internal/database"
 )
@@ -44,6 +48,42 @@ func handlerLogin(s *state, cmd command) error {
 		return fmt.Errorf("couldn't set current user: %w", err)
 	}
 	fmt.Printf("User has been set to: %s\n", username)
+	return nil
+}
+
+func handlerRegister(s *state, cmd command) error {
+	if len(cmd.args) == 0 {
+		return fmt.Errorf("usage: gator register <username>")
+	}
+	username := cmd.args[0]
+	// Check if user already exists
+	_, err := s.db.GetUser(context.Background(), username)
+	if err == nil {
+		return fmt.Errorf("user '%s' already exists", username)
+	}
+	if err != sql.ErrNoRows {
+		return fmt.Errorf("database error: %w", err)
+	}
+	// Create new user
+	now := time.Now()
+	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
+		ID:        uuid.New(),
+		CreatedAt: now,
+		UpdatedAt: now,
+		Name:      username,
+	})
+	if err != nil {
+		return fmt.Errorf("couldn't create user: %w", err)
+	}
+	// Set the current user in the config
+	err = s.cfg.SetUser(username)
+	if err != nil {
+		return fmt.Errorf("couldn't set current user: %w", err)
+	}
+	fmt.Printf("User '%s' created successfully!\n", username)
+	fmt.Printf("User data: ID=%s, Name=%s, CreatedAt=%s\n",
+		user.ID, user.Name, user.CreatedAt.Format(time.RFC3339))
+
 	return nil
 }
 
