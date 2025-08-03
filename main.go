@@ -43,7 +43,15 @@ func handlerLogin(s *state, cmd command) error {
 		return fmt.Errorf("usage: gator login <username>")
 	}
 	username := cmd.args[0]
-	err := s.cfg.SetUser(username)
+	// Check if user exists in database
+	_, err := s.db.GetUser(context.Background(), username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("user '%s' not found", username)
+		}
+		return fmt.Errorf("database error: %w", err)
+	}
+	err = s.cfg.SetUser(username)
 	if err != nil {
 		return fmt.Errorf("couldn't set current user: %w", err)
 	}
