@@ -8,13 +8,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	_ "github.com/lib/pq"
 	"github.com/quduss/gator/internal/config"
 	"github.com/quduss/gator/internal/database"
 )
 
 type state struct {
-	cfg *config.Config
 	db  *database.Queries
+	cfg *config.Config
 }
 
 type command struct {
@@ -101,13 +102,31 @@ func main() {
 		fmt.Printf("Error reading config: %v\n", err)
 		os.Exit(1)
 	}
+	// Open database connection
+	db, err := sql.Open("postgres", cfg.DbURL)
+	if err != nil {
+		fmt.Printf("Error connecting to database: %v\n", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+	// Test the connection
+	err = db.Ping()
+	if err != nil {
+		fmt.Printf("Error pinging database: %v\n", err)
+		os.Exit(1)
+	}
+	dbQueries := database.New(db)
+
 	programState := &state{
+		db:  dbQueries,
 		cfg: &cfg,
 	}
 	cmds := &commands{
 		handlers: make(map[string]func(*state, command) error),
 	}
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
+
 	args := os.Args
 	if len(args) < 2 {
 		fmt.Println("Error: not enough arguments provided")
