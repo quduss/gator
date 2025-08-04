@@ -108,6 +108,29 @@ func handlerReset(s *state, cmd command) error {
 	return nil
 }
 
+// handlerUsers handles the users command
+func handlerUsers(s *state, cmd command) error {
+	// Get all users from the database
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("couldn't get users: %w", err)
+	}
+
+	// Get current user from config
+	currentUser := s.cfg.CurrentUserName
+
+	// Print all users
+	for _, user := range users {
+		if user.Name == currentUser {
+			fmt.Printf("* %s (current)\n", user.Name)
+		} else {
+			fmt.Printf("* %s\n", user.Name)
+		}
+	}
+
+	return nil
+}
+
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
