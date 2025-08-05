@@ -156,6 +156,52 @@ func handlerAgg(s *state, cmd command) error {
 	return nil
 }
 
+// handlerAddFeed handles the addfeed command
+func handlerAddFeed(s *state, cmd command) error {
+	if len(cmd.args) != 2 {
+		return fmt.Errorf("usage: gator addfeed <name> <url>")
+	}
+
+	name := cmd.args[0]
+	url := cmd.args[1]
+
+	// Get the current user from the config
+	currentUserName := s.cfg.CurrentUserName
+	if currentUserName == "" {
+		return fmt.Errorf("no user is currently logged in")
+	}
+
+	// Get the current user from the database
+	user, err := s.db.GetUser(context.Background(), currentUserName)
+	if err != nil {
+		return fmt.Errorf("couldn't get current user: %w", err)
+	}
+
+	// Create the feed
+	now := time.Now()
+	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: now,
+		UpdatedAt: now,
+		Name:      name,
+		Url:       url,
+		UserID:    user.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("couldn't create feed: %w", err)
+	}
+
+	// Print the feed details
+	fmt.Printf("Feed created successfully!\n")
+	fmt.Printf("ID: %s\n", feed.ID)
+	fmt.Printf("Name: %s\n", feed.Name)
+	fmt.Printf("URL: %s\n", feed.Url)
+	fmt.Printf("User ID: %s\n", feed.UserID)
+	fmt.Printf("Created At: %s\n", feed.CreatedAt.Format(time.RFC3339))
+
+	return nil
+}
+
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
