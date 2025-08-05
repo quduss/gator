@@ -131,6 +131,31 @@ func handlerUsers(s *state, cmd command) error {
 	return nil
 }
 
+// handlerAgg handles the agg command
+func handlerAgg(s *state, cmd command) error {
+	// Fetch the RSS feed from wagslane.dev
+	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	if err != nil {
+		return fmt.Errorf("couldn't fetch feed: %w", err)
+	}
+
+	// Print the entire feed structure
+	fmt.Printf("Feed Title: %s\n", feed.Channel.Title)
+	fmt.Printf("Feed Link: %s\n", feed.Channel.Link)
+	fmt.Printf("Feed Description: %s\n", feed.Channel.Description)
+	fmt.Printf("\nItems:\n")
+
+	for i, item := range feed.Channel.Item {
+		fmt.Printf("\nItem %d:\n", i+1)
+		fmt.Printf("  Title: %s\n", item.Title)
+		fmt.Printf("  Link: %s\n", item.Link)
+		fmt.Printf("  Description: %s\n", item.Description)
+		fmt.Printf("  PubDate: %s\n", item.PubDate)
+	}
+
+	return nil
+}
+
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
