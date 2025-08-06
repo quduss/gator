@@ -202,6 +202,33 @@ func handlerAddFeed(s *state, cmd command) error {
 	return nil
 }
 
+// handlerFeeds handles the feeds command
+func handlerFeeds(s *state, cmd command) error {
+	// Get all feeds from the database
+	feeds, err := s.db.GetFeeds(context.Background())
+	if err != nil {
+		return fmt.Errorf("couldn't get feeds: %w", err)
+	}
+
+	// Print all feeds
+	if len(feeds) == 0 {
+		fmt.Println("No feeds found.")
+		return nil
+	}
+
+	fmt.Printf("Found %d feed(s):\n\n", len(feeds))
+
+	for i, feed := range feeds {
+		fmt.Printf("Feed %d:\n", i+1)
+		fmt.Printf("  Name: %s\n", feed.Name)
+		fmt.Printf("  URL: %s\n", feed.Url)
+		fmt.Printf("  User: %s\n", feed.UserName)
+		fmt.Println()
+	}
+
+	return nil
+}
+
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
