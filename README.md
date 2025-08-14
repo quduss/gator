@@ -154,7 +154,7 @@ Gator is built with:
 - **SQLC**: Type-safe database queries
 - **Goose**: Database migrations
 The application uses a middleware pattern for authentication and follows clean architecture principles with separate concerns for database access, RSS parsing, and command handling.
-### Development
+## Development
 ### Running from Source
 ```
 # Clone the repository
@@ -195,5 +195,13 @@ The application uses four main tables:
    - Some feeds may have invalid XML/dates
    - Check feed URL is accessible in browser
    - Look for error messages in aggregator output
+### Getting Help
+If you encounter issues:
+1. Check that all prerequisites are installed
+2. Verify your configuration file is correct
+3. Ensure PostgreSQL is running and accessible
+4. Check RSS feed URLs are valid and accessible
+## Contributing
+Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests.
 
 
