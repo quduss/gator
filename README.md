@@ -15,5 +15,5 @@ Before installing Gator, make sure you have the following installed:
 
 ## Required Software
 1. Go 1.19 or later
-   - Download from golang.org
+   - Download from [golang.org](golang.org)
    - Verify installation: `go version`
